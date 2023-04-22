@@ -19,9 +19,9 @@ class ORM:
         self.meta = MetaData(self.engine)  
 
         self.userTable = Table('users', self.meta, 
-                       Column('username', String),
-                       Column('password', String),
-                       Column('token',String)) # Users table
+                        Column('email',String),
+                        Column('username', String),
+                        Column('password', String)) # Users table
 
         self.marketTable = Table('markets', self.meta, 
                        Column('name', String),
@@ -38,9 +38,23 @@ class ORM:
 
         self.meta.create_all(self.engine)
 
-        if not self.IsUserExists("admin"):
-            self.AddUser("admin","secret_password","ALLWAYSHERE")
+        if not self.IsUserExists("admin@erratas.htb"):
+            self.AddUser("admin@erratas.htb","admin","secret_password")
 
+        print(self.GetUserByEmail("admin@erratas.htb").password)
+        self.UpdateUserPassword("admin@erratas.htb","hahahhahahuser")
+        print(self.GetUserByEmail("admin@erratas.htb").password)
+
+
+        print(self.GetUserByEmail("admin@erratas.htb").username)
+        self.UpdateUsername("admin@erratas.htb","lallala")
+        print(self.GetUserByEmail("admin@erratas.htb").username)
+
+        print(self.IsUserExists("admin@erratas.htb"))
+        self.DeleteUser("admin@erratas.htb")
+        print(self.IsUserExists("admin@erratas.htb"))
+
+        print(self.GetAllUsers())
 
     def UpdateSession(self):
         self.engine = create_engine(DBSTRING) 
@@ -50,36 +64,40 @@ class ORM:
         return Session()
 
     # User functions
-    def AddUser(self, username_, password_, token_="NULL"):
+    def AddUser(self, email_, username_, password_):
         session = self.GetSession()
-        session.add(User(username=username_, password=password_,token=token_))
+        session.add(User(email=email_,username=username_, password=password_))
         session.commit()
 
     def GetUserByUsername(self, username_):
         session = self.GetSession()
         return session.scalars(select(User).filter_by(username=username_)).first()
 
-    def IsUserExists(self, username_):
+    def GetUserByEmail(self,email_):
         session = self.GetSession()
-        return session.scalars(select(User).filter_by(username=username_)).first() is not None
+        return session.scalars(select(User).filter_by(email=email_)).first()
 
-    def UpdateUserPassword(self, username_, password_):
+    def IsUserExists(self, email_):
         session = self.GetSession()
-        session.query(User).filter(User.username==username_).update({'password': password_})
+        return session.scalars(select(User).filter_by(email=email_)).first() is not None
+
+    def UpdateUserPassword(self, email_, password_):
+        session = self.GetSession()
+        session.query(User).filter(User.email==email_).update({'password': password_})
         session.commit()
 
-    def UpdateUserToken(self, username_, token_):
+    def UpdateUsername(self, email_, username_):
         session = self.GetSession()
-        session.query(User).filter(User.username==username_).update({'token': token_})
+        session.query(User).filter(User.email==email_).update({'username': username_})
         session.commit()
 
     def GetAllUsers(self):
         session = self.GetSession()
         return session.scalars(select(User)).all()
 
-    def DeleteUser(self,username_):
+    def DeleteUser(self, email_):
         session = self.GetSession()
-        session.query(User).filter(User.username==username_).delete()
+        session.query(User).filter(User.email==email_).delete()
         session.commit()
 
     # Market functions
