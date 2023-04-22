@@ -3,8 +3,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-class Users(Base):
+class User(Base):
    __tablename__ = 'users'
    
-   id = Column(String, primary_key=True)
-   group = Column(String)
+   username = Column(String, primary_key=True)
+   password = Column(String)

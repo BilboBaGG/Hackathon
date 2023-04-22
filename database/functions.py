@@ -34,7 +34,7 @@ class ORM:
 
         session = self.getSession()
 
-        session.add(Student(username="admin", password="HELLO_WORLD"))
+        session.add(User(username="admin", password="HELLO_WORLD"))
         session.commit()
 
         print(session.scalars(select(User).filter_by(username="admin")).first().password)
