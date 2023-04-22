@@ -8,3 +8,4 @@ class Point(Base):
    
    name = Column(String, primary_key=True)
    point_code = Column(String)
+   market_code = Column(String)

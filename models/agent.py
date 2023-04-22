@@ -7,5 +7,4 @@ class Agent(Base):
    __tablename__ = 'agents'
    
    name = Column(String, primary_key=True)
-   market_code = Column(String)
-   code = Column(String)
+   point_code = Column(String)

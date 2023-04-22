@@ -8,3 +8,4 @@ class User(Base):
    
    username = Column(String, primary_key=True)
    password = Column(String)
+   token = Column(String)
