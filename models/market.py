@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 class Market(Base):
-   __tablename__ = 'users'
+   __tablename__ = 'markets'
    
    name = Column(String, primary_key=True)
    code = Column(String)
