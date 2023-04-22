@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, select, delete
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import Table, Column, String, MetaData
+from sqlalchemy import Table, Column, String, MetaData, Integer
 import time
 from models.user import User
 from models.market import Market
@@ -19,6 +19,7 @@ class ORM:
         self.meta = MetaData(self.engine)  
 
         self.userTable = Table('users', self.meta, 
+                        Column('id',Integer),
                         Column('email',String),
                         Column('username', String),
                         Column('password', String)) # Users table
@@ -38,21 +39,27 @@ class ORM:
 
         self.meta.create_all(self.engine)
 
-        if not self.IsUserExists("admin@erratas.htb"):
-            self.AddUser("admin@erratas.htb","admin","secret_password")
+        if not self.IsUserExists(12391299):
+            self.AddUser(12391299, "admin@erratas.htb","admin","secret_password")
 
-        print(self.GetUserByEmail("admin@erratas.htb").password)
-        self.UpdateUserPassword("admin@erratas.htb","hahahhahahuser")
-        print(self.GetUserByEmail("admin@erratas.htb").password)
+        print(self.GetUserByID(12391299).password)
+        self.UpdateUserPassword(12391299,"hahahhahahuser")
+        print(self.GetUserByID(12391299).password)
 
 
-        print(self.GetUserByEmail("admin@erratas.htb").username)
-        self.UpdateUsername("admin@erratas.htb","lallala")
-        print(self.GetUserByEmail("admin@erratas.htb").username)
 
-        print(self.IsUserExists("admin@erratas.htb"))
-        self.DeleteUser("admin@erratas.htb")
-        print(self.IsUserExists("admin@erratas.htb"))
+        print(self.GetUserByID(12391299).username)
+        self.UpdateUsername(12391299,"lallala")
+        print(self.GetUserByID(12391299).username)
+
+        print(self.GetUserByID(12391299).email)
+        self.UpdateUserEmail(12391299,"lallala")
+        print(self.GetUserByID(12391299).email)
+
+
+        print(self.IsUserExists(12391299))
+        self.DeleteUser(12391299)
+        print(self.IsUserExists(12391299))
 
         print(self.GetAllUsers())
 
@@ -64,9 +71,9 @@ class ORM:
         return Session()
 
     # User functions
-    def AddUser(self, email_, username_, password_):
+    def AddUser(self, id_, email_, username_, password_):
         session = self.GetSession()
-        session.add(User(email=email_,username=username_, password=password_))
+        session.add(User(id=id_,email=email_,username=username_, password=password_))
         session.commit()
 
     def GetUserByUsername(self, username_):
@@ -77,27 +84,36 @@ class ORM:
         session = self.GetSession()
         return session.scalars(select(User).filter_by(email=email_)).first()
 
-    def IsUserExists(self, email_):
+    def GetUserByID(self,id_):
         session = self.GetSession()
-        return session.scalars(select(User).filter_by(email=email_)).first() is not None
+        return session.scalars(select(User).filter_by(id=id_)).first()
 
-    def UpdateUserPassword(self, email_, password_):
+    def IsUserExists(self, id_):
         session = self.GetSession()
-        session.query(User).filter(User.email==email_).update({'password': password_})
+        return session.scalars(select(User).filter_by(id=id_)).first() is not None
+
+    def UpdateUserPassword(self, id_, password_):
+        session = self.GetSession()
+        session.query(User).filter(User.id==id_).update({'password': password_})
         session.commit()
 
-    def UpdateUsername(self, email_, username_):
+    def UpdateUsername(self, id_, username_):
         session = self.GetSession()
-        session.query(User).filter(User.email==email_).update({'username': username_})
+        session.query(User).filter(User.id==id_).update({'username': username_})
+        session.commit()
+
+    def UpdateUserEmail(self, id_, email_):
+        session = self.GetSession()
+        session.query(User).filter(User.id==id_).update({'email': email_})
         session.commit()
 
     def GetAllUsers(self):
         session = self.GetSession()
         return session.scalars(select(User)).all()
 
-    def DeleteUser(self, email_):
+    def DeleteUser(self, id_):
         session = self.GetSession()
-        session.query(User).filter(User.email==email_).delete()
+        session.query(User).filter(User.id==id_).delete()
         session.commit()
 
     # Market functions

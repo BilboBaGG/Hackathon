@@ -1,2 +1,4 @@
 SQLAlchemy==1.4.42
 psycopg2==2.9.4
+Flask==2.2.2
+Flask-Login==0.6.2
