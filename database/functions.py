@@ -42,29 +42,6 @@ class ORM:
             self.AddUser("admin","secret_password","ALLWAYSHERE")
 
 
-        if not self.IsPointExists("Baza"):
-            self.AddPoint("Baza","AJSDJJSDJ","HELLO")
-            print("ha")
-
-        print(self.GetPointByName("Baza").point_code)
-        self.UpdatePointsSelfCode("Baza","hahahhaha")
-        print(self.GetPointByName("Baza").point_code)
-
-
-
-        print(self.GetPointByName("Baza").market_code)
-        self.UpdatePointsMarketCode("Basa","lallala")
-        print(self.GetPointByName("Baza").market_code)
-
-        print(self.IsPointExists("Baza"))
-        self.DeletePoint("Baza")
-        print(self.IsPointExists("Baza"))
-        
-
-
-        print(self.GetAllPoints())
-
-
     def UpdateSession(self):
         self.engine = create_engine(DBSTRING) 
 
@@ -164,4 +141,32 @@ class ORM:
     def DeletePoint(self,name_):
         session = self.GetSession()
         session.query(Point).filter(Point.name==name_).delete()
+        session.commit()
+
+    # Agent functions
+    def AddAgent(self, name_, point_code_):
+        session = self.GetSession()
+        session.add(Agent(name=name_, point_code=point_code_))
+        session.commit()
+
+    def GetAgentByName(self, name_):
+        session = self.GetSession()
+        return session.scalars(select(Agent).filter_by(name=name_)).first()
+
+    def IsAgentExists(self, name_):
+        session = self.GetSession()
+        return session.scalars(select(Agent).filter_by(name=name_)).first() is not None
+
+    def UpdateAgentPointCode(self, name_, point_code_):
+        session = self.GetSession()
+        session.query(Agent).filter(Agent.name==name_).update({'point_code': point_code_})
+        session.commit()
+
+    def GetAllAgents(self):
+        session = self.GetSession()
+        return session.scalars(select(Agent)).all()
+
+    def DeleteAgent(self,name_):
+        session = self.GetSession()
+        session.query(Agent).filter(Agent.name==name_).delete()
         session.commit()
