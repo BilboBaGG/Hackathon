@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from flask_login import UserMixin
 
@@ -10,3 +10,4 @@ class User(Base):
    email = Column(String, primary_key=True)
    username = Column(String)
    password = Column(String)
+   is_admin = Column(Boolean)

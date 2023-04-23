@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, select, delete
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import Table, Column, String, MetaData, Integer
+from sqlalchemy import Table, Column, String, MetaData, Integer, Boolean
 import time, hashlib
 from models.user import User
 from models.market import Market
@@ -22,7 +22,8 @@ class ORM:
                         Column('id',String),
                         Column('email',String),
                         Column('username', String),
-                        Column('password', String)) # Users table
+                        Column('password', String),
+                        Column('is_admin', Boolean)) # Users table
 
         self.marketTable = Table('markets', self.meta, 
                        Column('name', String),
@@ -40,23 +41,35 @@ class ORM:
         self.meta.create_all(self.engine)
 
         if not self.IsUserExists(hashlib.sha256(b'admin').hexdigest()):
-            self.AddUser(hashlib.sha256(b'admin').hexdigest(), "admin@erratas.htb","admin","secret_password")
+            self.AddUser(email_="admin@erratas.htb",username_="admin",password_=hashlib.sha256(b"secret_password").hexdigest(),is_admin_=True)
+
+        print(self.CheckUser("admin",hashlib.sha256(b"secret_password").hexdigest()))
+
     def UpdateSession(self):
         self.engine = create_engine(DBSTRING) 
+
+    def CheckUser(self,username_,passwordhash_):
+        session = self.GetSession()
+        return session.scalars(select(User).filter_by(username=username_, password=passwordhash_)).first() is not None
+
 
     def GetSession(self):
         Session = sessionmaker(self.engine)
         return Session()
 
     # User functions
-    def AddUser(self, id_, email_, username_, password_):
+    def AddUser(self, email_, username_, password_, is_admin_=False):
         session = self.GetSession()
-        session.add(User(id=id_,email=email_,username=username_, password=password_))
+        session.add(User(id=hashlib.sha256(username_.encode()).hexdigest(),email=email_,username=username_, password=password_, is_admin=is_admin_))
         session.commit()
 
     def GetUserByUsername(self, username_):
         session = self.GetSession()
         return session.scalars(select(User).filter_by(username=username_)).first()
+
+    def IsAdmin(self, username_):
+        session = self.GetSession()
+        return session.scalars(select(User).filter_by(username=username_)).first().is_admin
 
     def GetUserByEmail(self,email_):
         session = self.GetSession()
