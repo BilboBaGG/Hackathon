@@ -1,9 +1,11 @@
 FROM python:latest
 
-COPY . /project
-
-WORKDIR /project  
+COPY ./requirements.txt requirements.txt
 
 RUN pip install -r requirements.txt
 
-CMD ["python3", "app.py"]
+COPY . .
+
+EXPOSE 5000
+
+ENTRYPOINT [ "python3", "-m" ,"app", "--host=0.0.0.0", "--port=5000" ]

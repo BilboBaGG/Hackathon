@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, select, delete
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Table, Column, String, MetaData, Integer
-import time
+import time, hashlib
 from models.user import User
 from models.market import Market
 from models.point import Point
@@ -19,7 +19,7 @@ class ORM:
         self.meta = MetaData(self.engine)  
 
         self.userTable = Table('users', self.meta, 
-                        Column('id',Integer),
+                        Column('id',String),
                         Column('email',String),
                         Column('username', String),
                         Column('password', String)) # Users table
@@ -39,30 +39,8 @@ class ORM:
 
         self.meta.create_all(self.engine)
 
-        if not self.IsUserExists(12391299):
-            self.AddUser(12391299, "admin@erratas.htb","admin","secret_password")
-
-        print(self.GetUserByID(12391299).password)
-        self.UpdateUserPassword(12391299,"hahahhahahuser")
-        print(self.GetUserByID(12391299).password)
-
-
-
-        print(self.GetUserByID(12391299).username)
-        self.UpdateUsername(12391299,"lallala")
-        print(self.GetUserByID(12391299).username)
-
-        print(self.GetUserByID(12391299).email)
-        self.UpdateUserEmail(12391299,"lallala")
-        print(self.GetUserByID(12391299).email)
-
-
-        print(self.IsUserExists(12391299))
-        self.DeleteUser(12391299)
-        print(self.IsUserExists(12391299))
-
-        print(self.GetAllUsers())
-
+        if not self.IsUserExists(hashlib.sha256(b'admin').hexdigest()):
+            self.AddUser(hashlib.sha256(b'admin').hexdigest(), "admin@erratas.htb","admin","secret_password")
     def UpdateSession(self):
         self.engine = create_engine(DBSTRING) 
 
